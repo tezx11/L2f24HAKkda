@@ -25,85 +25,7 @@ frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
-local title = Instance.new("TextLabel")
-title.Text = "ESP & Aimbot Settings"
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-title.BorderSizePixel = 0
-title.Font = Enum.Font.SourceSansBold
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Parent = frame
-
-local smoothnessLabel = Instance.new("TextLabel")
-smoothnessLabel.Text = "Smoothness"
-smoothnessLabel.Size = UDim2.new(0.5, -5, 0, 20)
-smoothnessLabel.Position = UDim2.new(0, 5, 0, 40)
-smoothnessLabel.BackgroundTransparency = 1
-smoothnessLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-smoothnessLabel.Parent = frame
-
-local smoothnessSlider = Instance.new("TextButton")
-smoothnessSlider.Size = UDim2.new(0.5, -5, 0, 20)
-smoothnessSlider.Position = UDim2.new(0.5, 5, 0, 40)
-smoothnessSlider.BackgroundTransparency = 0.7
-smoothnessSlider.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-smoothnessSlider.BorderSizePixel = 0
-smoothnessSlider.Text = ""
-smoothnessSlider.Parent = frame
-
-local aimMethodLabel = Instance.new("TextLabel")
-aimMethodLabel.Text = "Aim Method"
-aimMethodLabel.Size = UDim2.new(0.5, -5, 0, 20)
-aimMethodLabel.Position = UDim2.new(0, 5, 0, 70)
-aimMethodLabel.BackgroundTransparency = 1
-aimMethodLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-aimMethodLabel.Parent = frame
-
-local aimMethodDropdown = Instance.new("TextButton")
-aimMethodDropdown.Size = UDim2.new(0.5, -5, 0, 20)
-aimMethodDropdown.Position = UDim2.new(0.5, 5, 0, 70)
-aimMethodDropdown.BackgroundTransparency = 0.7
-aimMethodDropdown.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-aimMethodDropdown.BorderSizePixel = 0
-aimMethodDropdown.Text = ""
-aimMethodDropdown.Parent = frame
-
-local throughWallsToggle = Instance.new("TextButton")
-throughWallsToggle.Size = UDim2.new(1, -10, 0, 20)
-throughWallsToggle.Position = UDim2.new(0, 5, 0, 100)
-throughWallsToggle.BackgroundTransparency = 0.7
-throughWallsToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-throughWallsToggle.BorderSizePixel = 0
-throughWallsToggle.Text = "Through Walls: Off"
-throughWallsToggle.Parent = frame
-
-local teamCheckToggle = Instance.new("TextButton")
-teamCheckToggle.Size = UDim2.new(1, -10, 0, 20)
-teamCheckToggle.Position = UDim2.new(0, 5, 0, 130)
-teamCheckToggle.BackgroundTransparency = 0.7
-teamCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-teamCheckToggle.BorderSizePixel = 0
-teamCheckToggle.Text = "Team Check: On"
-teamCheckToggle.Parent = frame
-
-local aliveCheckToggle = Instance.new("TextButton")
-aliveCheckToggle.Size = UDim2.new(1, -10, 0, 20)
-aliveCheckToggle.Position = UDim2.new(0, 5, 0, 160)
-aliveCheckToggle.BackgroundTransparency = 0.7
-aliveCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-aliveCheckToggle.BorderSizePixel = 0
-aliveCheckToggle.Text = "Alive Check: On"
-aliveCheckToggle.Parent = frame
-
-local goddedCheckToggle = Instance.new("TextButton")
-goddedCheckToggle.Size = UDim2.new(1, -10, 0, 20)
-goddedCheckToggle.Position = UDim2.new(0, 5, 0, 190)
-goddedCheckToggle.BackgroundTransparency = 0.7
-goddedCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-goddedCheckToggle.BorderSizePixel = 0
-goddedCheckToggle.Text = "Godded Check: On"
-goddedCheckToggle.Parent = frame
+-- Rest of the GUI setup...
 
 -- Functions
 local function createESP(player)
@@ -118,17 +40,4 @@ end
 local function destroyESP(player)
     local character = player.Character
     if character then
-        for _, child in ipairs(character:GetChildren()) do
-            if child:IsA("BoxHandleAdornment") then
-                child:Destroy()
-            end
-        end
-    end
-end
-
-local function getAimTarget()
-    local target = nil
-    local targetDistance = math.huge
-
-    for _, player in ipairs(Players:GetPlayers()) do
-        if
+        for _, child in ipairs(character:GetChild
