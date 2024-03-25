@@ -1,0 +1,119 @@
+-- Create a ScreenGui to hold our UI elements
+local gui = Instance.new("ScreenGui")
+gui.Name = "ChamsToggleGui"
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+-- Create a Frame to hold the toggle buttons
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 120)
+frame.Position = UDim2.new(0.5, -100, 0, 10)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Background color
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+-- Variable to keep track of chams state
+local chamsEnabled = false
+local namesEnabled = false
+
+-- Function to toggle chams effect on or off
+local function toggleChams()
+    chamsEnabled = not chamsEnabled
+    if chamsEnabled then
+        -- Enable chams effect for existing players
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character and player ~= game.Players.LocalPlayer then
+                createOutline(player.Character)
+            end
+        end
+        -- Connect event to create chams effect for new players
+        game.Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function(character)
+                createOutline(character)
+            end)
+        end)
+        print("Chams enabled")
+    else
+        -- Disable chams effect
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character and player ~= game.Players.LocalPlayer then
+                removeOutline(player.Character)
+            end
+        end
+        print("Chams disabled")
+    end
+end
+
+-- Function to toggle names display on or off
+local function toggleNames()
+    namesEnabled = not namesEnabled
+    if namesEnabled then
+        -- Show names
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local nameTag = Instance.new("BillboardGui")
+                nameTag.Adornee = player.Character.Head
+                nameTag.Name = "NameTag"
+                nameTag.Size = UDim2.new(0, 100, 0, 20)
+                nameTag.StudsOffset = Vector3.new(0, 2, 0)
+                nameTag.AlwaysOnTop = true
+
+                local nameLabel = Instance.new("TextLabel")
+                nameLabel.Text = player.Name
+                nameLabel.Size = UDim2.new(1, 0, 1, 0)
+                nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Font = Enum.Font.SourceSans
+                nameLabel.Parent = nameTag
+
+                nameTag.Parent = player.Character.Head
+            end
+        end
+        print("Names enabled")
+    else
+        -- Hide names
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local nameTag = player.Character.Head:FindFirstChild("NameTag")
+                if nameTag then
+                    nameTag:Destroy()
+                end
+            end
+        end
+        print("Names disabled")
+    end
+end
+
+-- Function to destroy the script and UI
+local function destroyScript()
+    gui:Destroy()
+    script:Destroy()
+end
+
+-- Create a TextButton for toggling the chams effect
+local chamsButton = Instance.new("TextButton")
+chamsButton.Text = "Toggle Chams"
+chamsButton.Size = UDim2.new(0, 100, 0, 30)
+chamsButton.Position = UDim2.new(0, 10, 0, 10)
+chamsButton.Parent = frame
+chamsButton.MouseButton1Click:Connect(toggleChams)
+
+-- Create a TextButton for toggling the names display
+local namesButton = Instance.new("TextButton")
+namesButton.Text = "Toggle Names"
+namesButton.Size = UDim2.new(0, 100, 0, 30)
+namesButton.Position = UDim2.new(0, 10, 0, 50) -- Adjusted position
+namesButton.Parent = frame
+namesButton.MouseButton1Click:Connect(toggleNames)
+
+-- Create a TextButton to destroy the script
+local destroyButton = Instance.new("TextButton")
+destroyButton.Text = "Destroy Script"
+destroyButton.Size = UDim2.new(0, 180, 0, 30)
+destroyButton.Position = UDim2.new(0.5, -90, 0, 80) -- Adjusted position
+destroyButton.Parent = frame
+destroyButton.MouseButton1Click:Connect(destroyScript)
+
+-- Create a TextLabel for the script name
+local scriptNameLabel = Instance.new("TextLabel")
+scriptNameLabel.Text = "Script Name: tez11"
+scriptNameLabel.Size = UDim2.new(1,
