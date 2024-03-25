@@ -1,119 +1,134 @@
--- Create a ScreenGui to hold our UI elements
-local gui = Instance.new("ScreenGui")
-gui.Name = "ChamsToggleGui"
-gui.Parent = game.Players.LocalPlayer.PlayerGui
+-- Services
+local Players = game:GetService("Players")
+local Camera = game:GetService("Workspace").CurrentCamera
+local UserInputService = game:GetService("UserInputService")
 
--- Create a Frame to hold the toggle buttons
+-- Settings
+local smoothness = 0.5
+local aimMethod = "Nearest" -- "Nearest" or "LowestDistance"
+local holdKey = Enum.KeyCode.Q
+local throughWalls = false
+local teamCheck = true
+local aliveCheck = true
+local goddedCheck = true
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "ESP_Aimbot_UI"
+gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 120)
-frame.Position = UDim2.new(0.5, -100, 0, 10)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Background color
+frame.Size = UDim2.new(0, 200, 0, 200)
+frame.Position = UDim2.new(0.5, -100, 0.5, -100)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
--- Variable to keep track of chams state
-local chamsEnabled = false
-local namesEnabled = false
+local title = Instance.new("TextLabel")
+title.Text = "ESP & Aimbot Settings"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.BorderSizePixel = 0
+title.Font = Enum.Font.SourceSansBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = frame
 
--- Function to toggle chams effect on or off
-local function toggleChams()
-    chamsEnabled = not chamsEnabled
-    if chamsEnabled then
-        -- Enable chams effect for existing players
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player.Character and player ~= game.Players.LocalPlayer then
-                createOutline(player.Character)
+local smoothnessLabel = Instance.new("TextLabel")
+smoothnessLabel.Text = "Smoothness"
+smoothnessLabel.Size = UDim2.new(0.5, -5, 0, 20)
+smoothnessLabel.Position = UDim2.new(0, 5, 0, 40)
+smoothnessLabel.BackgroundTransparency = 1
+smoothnessLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+smoothnessLabel.Parent = frame
+
+local smoothnessSlider = Instance.new("TextButton")
+smoothnessSlider.Size = UDim2.new(0.5, -5, 0, 20)
+smoothnessSlider.Position = UDim2.new(0.5, 5, 0, 40)
+smoothnessSlider.BackgroundTransparency = 0.7
+smoothnessSlider.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+smoothnessSlider.BorderSizePixel = 0
+smoothnessSlider.Text = ""
+smoothnessSlider.Parent = frame
+
+local aimMethodLabel = Instance.new("TextLabel")
+aimMethodLabel.Text = "Aim Method"
+aimMethodLabel.Size = UDim2.new(0.5, -5, 0, 20)
+aimMethodLabel.Position = UDim2.new(0, 5, 0, 70)
+aimMethodLabel.BackgroundTransparency = 1
+aimMethodLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+aimMethodLabel.Parent = frame
+
+local aimMethodDropdown = Instance.new("TextButton")
+aimMethodDropdown.Size = UDim2.new(0.5, -5, 0, 20)
+aimMethodDropdown.Position = UDim2.new(0.5, 5, 0, 70)
+aimMethodDropdown.BackgroundTransparency = 0.7
+aimMethodDropdown.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+aimMethodDropdown.BorderSizePixel = 0
+aimMethodDropdown.Text = ""
+aimMethodDropdown.Parent = frame
+
+local throughWallsToggle = Instance.new("TextButton")
+throughWallsToggle.Size = UDim2.new(1, -10, 0, 20)
+throughWallsToggle.Position = UDim2.new(0, 5, 0, 100)
+throughWallsToggle.BackgroundTransparency = 0.7
+throughWallsToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+throughWallsToggle.BorderSizePixel = 0
+throughWallsToggle.Text = "Through Walls: Off"
+throughWallsToggle.Parent = frame
+
+local teamCheckToggle = Instance.new("TextButton")
+teamCheckToggle.Size = UDim2.new(1, -10, 0, 20)
+teamCheckToggle.Position = UDim2.new(0, 5, 0, 130)
+teamCheckToggle.BackgroundTransparency = 0.7
+teamCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+teamCheckToggle.BorderSizePixel = 0
+teamCheckToggle.Text = "Team Check: On"
+teamCheckToggle.Parent = frame
+
+local aliveCheckToggle = Instance.new("TextButton")
+aliveCheckToggle.Size = UDim2.new(1, -10, 0, 20)
+aliveCheckToggle.Position = UDim2.new(0, 5, 0, 160)
+aliveCheckToggle.BackgroundTransparency = 0.7
+aliveCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+aliveCheckToggle.BorderSizePixel = 0
+aliveCheckToggle.Text = "Alive Check: On"
+aliveCheckToggle.Parent = frame
+
+local goddedCheckToggle = Instance.new("TextButton")
+goddedCheckToggle.Size = UDim2.new(1, -10, 0, 20)
+goddedCheckToggle.Position = UDim2.new(0, 5, 0, 190)
+goddedCheckToggle.BackgroundTransparency = 0.7
+goddedCheckToggle.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+goddedCheckToggle.BorderSizePixel = 0
+goddedCheckToggle.Text = "Godded Check: On"
+goddedCheckToggle.Parent = frame
+
+-- Functions
+local function createESP(player)
+    local espBox = Instance.new("BoxHandleAdornment")
+    espBox.Adornee = player.Character.HumanoidRootPart
+    espBox.Size = player.Character.HumanoidRootPart.Size
+    espBox.Color3 = Color3.new(1, 0, 0)
+    espBox.AlwaysOnTop = true
+    espBox.Parent = player.Character
+end
+
+local function destroyESP(player)
+    local character = player.Character
+    if character then
+        for _, child in ipairs(character:GetChildren()) do
+            if child:IsA("BoxHandleAdornment") then
+                child:Destroy()
             end
         end
-        -- Connect event to create chams effect for new players
-        game.Players.PlayerAdded:Connect(function(player)
-            player.CharacterAdded:Connect(function(character)
-                createOutline(character)
-            end)
-        end)
-        print("Chams enabled")
-    else
-        -- Disable chams effect
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player.Character and player ~= game.Players.LocalPlayer then
-                removeOutline(player.Character)
-            end
-        end
-        print("Chams disabled")
     end
 end
 
--- Function to toggle names display on or off
-local function toggleNames()
-    namesEnabled = not namesEnabled
-    if namesEnabled then
-        -- Show names
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player ~= game.Players.LocalPlayer then
-                local nameTag = Instance.new("BillboardGui")
-                nameTag.Adornee = player.Character.Head
-                nameTag.Name = "NameTag"
-                nameTag.Size = UDim2.new(0, 100, 0, 20)
-                nameTag.StudsOffset = Vector3.new(0, 2, 0)
-                nameTag.AlwaysOnTop = true
+local function getAimTarget()
+    local target = nil
+    local targetDistance = math.huge
 
-                local nameLabel = Instance.new("TextLabel")
-                nameLabel.Text = player.Name
-                nameLabel.Size = UDim2.new(1, 0, 1, 0)
-                nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-                nameLabel.BackgroundTransparency = 1
-                nameLabel.Font = Enum.Font.SourceSans
-                nameLabel.Parent = nameTag
-
-                nameTag.Parent = player.Character.Head
-            end
-        end
-        print("Names enabled")
-    else
-        -- Hide names
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player ~= game.Players.LocalPlayer then
-                local nameTag = player.Character.Head:FindFirstChild("NameTag")
-                if nameTag then
-                    nameTag:Destroy()
-                end
-            end
-        end
-        print("Names disabled")
-    end
-end
-
--- Function to destroy the script and UI
-local function destroyScript()
-    gui:Destroy()
-    script:Destroy()
-end
-
--- Create a TextButton for toggling the chams effect
-local chamsButton = Instance.new("TextButton")
-chamsButton.Text = "Toggle Chams"
-chamsButton.Size = UDim2.new(0, 100, 0, 30)
-chamsButton.Position = UDim2.new(0, 10, 0, 10)
-chamsButton.Parent = frame
-chamsButton.MouseButton1Click:Connect(toggleChams)
-
--- Create a TextButton for toggling the names display
-local namesButton = Instance.new("TextButton")
-namesButton.Text = "Toggle Names"
-namesButton.Size = UDim2.new(0, 100, 0, 30)
-namesButton.Position = UDim2.new(0, 10, 0, 50) -- Adjusted position
-namesButton.Parent = frame
-namesButton.MouseButton1Click:Connect(toggleNames)
-
--- Create a TextButton to destroy the script
-local destroyButton = Instance.new("TextButton")
-destroyButton.Text = "Destroy Script"
-destroyButton.Size = UDim2.new(0, 180, 0, 30)
-destroyButton.Position = UDim2.new(0.5, -90, 0, 80) -- Adjusted position
-destroyButton.Parent = frame
-destroyButton.MouseButton1Click:Connect(destroyScript)
-
--- Create a TextLabel for the script name
-local scriptNameLabel = Instance.new("TextLabel")
-scriptNameLabel.Text = "Script Name: tez11"
-scriptNameLabel.Size = UDim2.new(1,
+    for _, player in ipairs(Players:GetPlayers()) do
+        if
