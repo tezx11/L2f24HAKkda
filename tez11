@@ -40,4 +40,42 @@ end
 local function destroyESP(player)
     local character = player.Character
     if character then
-        for _, child in ipairs(character:GetChild
+        for _, child in ipairs(character:GetChildren()) do
+            if child:IsA("BoxHandleAdornment") then
+                child:Destroy()
+            end
+        end
+    end
+end
+
+local function getAimTarget()
+    local target = nil
+    local targetDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character.Humanoid.Health > 0 then
+            if teamCheck and player.Team ~= game.Players.LocalPlayer.Team then
+                local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    local screenPosition, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+                    if onScreen then
+                        local distance = (Vector2.new(screenPosition.X, screenPosition.Y) - Vector2.new(0.5, 0.5)).Magnitude
+                        if distance < targetDistance then
+                            target = rootPart
+                            targetDistance = distance
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return target
+end
+
+-- Rest of the functions...
+
+-- Initialization
+for _, player in ipairs(Players:GetPlayers()) do
+    createESP(player)
+end
