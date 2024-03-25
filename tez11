@@ -11,6 +11,7 @@ local throughWalls = false
 local teamCheck = true
 local aliveCheck = true
 local goddedCheck = true
+local lockOnHold = true
 
 -- GUI
 local gui = Instance.new("ScreenGui")
@@ -18,14 +19,24 @@ gui.Name = "ESP_Aimbot_UI"
 gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 200)
-frame.Position = UDim2.new(0.5, -100, 0.5, -100)
+frame.Size = UDim2.new(0, 200, 0, 300)
+frame.Position = UDim2.new(0.5, -100, 0.5, -150)
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 frame.BorderSizePixel = 0
 frame.Parent = gui
 
--- Rest of the GUI setup...
+local title = Instance.new("TextLabel")
+title.Text = "ESP & Aimbot Settings"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.BorderSizePixel = 0
+title.Font = Enum.Font.SourceSansBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Parent = frame
+
+-- Add more UI elements for options...
 
 -- Functions
 local function createESP(player)
@@ -35,13 +46,28 @@ local function createESP(player)
     espBox.Color3 = Color3.new(1, 0, 0)
     espBox.AlwaysOnTop = true
     espBox.Parent = player.Character
+
+    local nameLabel = Instance.new("BillboardGui")
+    nameLabel.Size = UDim2.new(0, 100, 0, 20)
+    nameLabel.StudsOffset = Vector3.new(0, 2, 0)
+    nameLabel.Adornee = player.Character.Head
+    nameLabel.Parent = player.Character
+
+    local nameLabelText = Instance.new("TextLabel")
+    nameLabelText.Text = player.Name
+    nameLabelText.Size = UDim2.new(1, 0, 1, 0)
+    nameLabelText.BackgroundTransparency = 1
+    nameLabelText.TextColor3 = Color3.new(1, 1, 1)
+    nameLabelText.TextStrokeTransparency = 0.5
+    nameLabelText.TextStrokeColor3 = Color3.new(0, 0, 0)
+    nameLabelText.Parent = nameLabel
 end
 
 local function destroyESP(player)
     local character = player.Character
     if character then
         for _, child in ipairs(character:GetChildren()) do
-            if child:IsA("BoxHandleAdornment") then
+            if child:IsA("BoxHandleAdornment") or child:IsA("BillboardGui") then
                 child:Destroy()
             end
         end
@@ -73,9 +99,42 @@ local function getAimTarget()
     return target
 end
 
--- Rest of the functions...
+local function aimAt(position)
+    local screenSize = Camera.ViewportSize
+    local centerScreen = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+    local aimDirection = (position - centerScreen).unit
+
+    if smoothness == 0 then
+        mousemoverel(aimDirection.X, aimDirection.Y)
+    else
+        local currentPos = Vector2.new(mouse.X, mouse.Y)
+        local newPos = currentPos + (aimDirection * smoothness)
+        mousemoverel(newPos.X - currentPos.X, newPos.Y - currentPos.Y)
+    end
+end
+
+-- Event handling
+Players.PlayerAdded:Connect(function(player)
+    createESP(player)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    destroyESP(player)
+end)
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == holdKey then
+        if lockOnHold then
+            local target = getAimTarget()
+            if target then
+                aimAt(Camera:WorldToScreenPoint(target.Position))
+            end
+        end
+    end
+end)
 
 -- Initialization
 for _, player in ipairs(Players:GetPlayers()) do
     createESP(player)
 end
+```
