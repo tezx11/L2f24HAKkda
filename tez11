@@ -1,4 +1,5 @@
 local g = game
+local w = g.Workspace
 local l = g.Lighting
 local t = w.Terrain
 t.WaterReflectance = 0
