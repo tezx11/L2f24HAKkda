@@ -9,7 +9,7 @@
 
 -- // Dependencies
 local Library, AimingTab, _ = loadstring(game:HttpGet("https://raw.githubusercontent.com/tezx11/tez11/main/ESPshit"))() -- // GUI
-local Aiming = loadstring(game:HttpGet("https://pastebin.com/raw/5hbk4GTH"))()("Module")
+local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/tezx11/Lib/main/AimingLoad"))()("Module")
 local AimingChecks = Aiming.Checks
 local AimingSelected = Aiming.Selected
 local AimingSettingsIgnored = Aiming.Settings.Ignored
