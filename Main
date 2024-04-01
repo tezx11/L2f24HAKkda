@@ -23,7 +23,7 @@ local UserInputService = game:GetService("UserInputService")
 local Configuration = {
     -- // The ones under this you may change - if you are a normal user
     Enabled = true,
-    Method = "FindPartOnRay",
+    Method = "FindPartOnRayWithIgnoreList",
     FocusMode = false, -- // Stays locked on to that player only. If true then uses the silent aim keybind, if a input type is entered, then that is used
     ToggleBind = false, -- // true = Toggle, false = Hold (to enable)
     Keybind = Enum.KeyCode.E, -- // You can also have Enum.KeyCode.E, etc.
